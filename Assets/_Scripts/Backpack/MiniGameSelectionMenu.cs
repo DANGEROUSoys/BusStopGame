@@ -13,6 +13,8 @@ public class MiniGameSelectionMenu : MonoBehaviour
     {
         _input = input;
         _eventBus = eventBus;
+
+        _boneMiniGame.Initialize(_input, _eventBus);
     }
     public void StartSelectionMenu()
     {
