@@ -4,7 +4,7 @@ using UnityEngine;
 public class MiniGameSelectionMenu : MonoBehaviour
 {
     [SerializeField] private GameObject _menu;
-    [SerializeField] private BoneMiniGame _boneMiniGame;
+    [SerializeField] private BoneMiniGame.BoneMiniGame _boneMiniGame;
     private PlayerInput _input;
     private EventBus _eventBus;
     private Coroutine _selectionMenuUpdate;

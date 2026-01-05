@@ -81,8 +81,7 @@ public class ShadowAnomaly : MonoBehaviour, IInteractive
             if(_currentTime < 0)
                 _currentTime = 0;
             _shadowAnomalyView.ChangeShadowScale(_currentTime);
-            
-            Debug.Log(_currentTime);
+
             yield return null;
         }
     }

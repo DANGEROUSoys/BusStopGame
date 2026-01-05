@@ -93,6 +93,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             ""id"": ""ca84079e-ca8b-4d30-9c4d-490be9e0ac60"",
             ""actions"": [
                 {
+                    ""name"": ""MouseMovement"",
+                    ""type"": ""Value"",
+                    ""id"": ""5eef1ff7-4d93-42a3-9c90-c0a3eaa456e3"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
                     ""name"": ""MousePosition"",
                     ""type"": ""Value"",
                     ""id"": ""37135564-3c30-4c09-ab36-40a8eea71968"",
@@ -150,6 +159,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""name"": ""Quit"",
                     ""type"": ""Button"",
                     ""id"": ""4bed72f9-8396-4238-8113-9f232f8758c6"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""07396554-6b57-4251-a36c-fde943d17388"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -288,6 +306,28 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""Quit"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dbea637a-0712-48d9-ba9d-fd449409ad53"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MouseMovement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""40671d4a-b2ae-4427-b133-e8840062faf0"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -296,6 +336,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
 }");
         // Game
         m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
+        m_Game_MouseMovement = m_Game.FindAction("MouseMovement", throwIfNotFound: true);
         m_Game_MousePosition = m_Game.FindAction("MousePosition", throwIfNotFound: true);
         m_Game_XInput = m_Game.FindAction("XInput", throwIfNotFound: true);
         m_Game_Smartphone = m_Game.FindAction("Smartphone", throwIfNotFound: true);
@@ -303,6 +344,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Game_AlterInteract = m_Game.FindAction("AlterInteract", throwIfNotFound: true);
         m_Game_LeftClick = m_Game.FindAction("LeftClick", throwIfNotFound: true);
         m_Game_Quit = m_Game.FindAction("Quit", throwIfNotFound: true);
+        m_Game_RightClick = m_Game.FindAction("RightClick", throwIfNotFound: true);
     }
 
     ~@PlayerInput()
@@ -383,6 +425,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     // Game
     private readonly InputActionMap m_Game;
     private List<IGameActions> m_GameActionsCallbackInterfaces = new List<IGameActions>();
+    private readonly InputAction m_Game_MouseMovement;
     private readonly InputAction m_Game_MousePosition;
     private readonly InputAction m_Game_XInput;
     private readonly InputAction m_Game_Smartphone;
@@ -390,6 +433,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Game_AlterInteract;
     private readonly InputAction m_Game_LeftClick;
     private readonly InputAction m_Game_Quit;
+    private readonly InputAction m_Game_RightClick;
     /// <summary>
     /// Provides access to input actions defined in input action map "Game".
     /// </summary>
@@ -401,6 +445,10 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// Construct a new instance of the input action map wrapper class.
         /// </summary>
         public GameActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "Game/MouseMovement".
+        /// </summary>
+        public InputAction @MouseMovement => m_Wrapper.m_Game_MouseMovement;
         /// <summary>
         /// Provides access to the underlying input action "Game/MousePosition".
         /// </summary>
@@ -430,6 +478,10 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Quit => m_Wrapper.m_Game_Quit;
         /// <summary>
+        /// Provides access to the underlying input action "Game/RightClick".
+        /// </summary>
+        public InputAction @RightClick => m_Wrapper.m_Game_RightClick;
+        /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Game; }
@@ -455,6 +507,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_GameActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_GameActionsCallbackInterfaces.Add(instance);
+            @MouseMovement.started += instance.OnMouseMovement;
+            @MouseMovement.performed += instance.OnMouseMovement;
+            @MouseMovement.canceled += instance.OnMouseMovement;
             @MousePosition.started += instance.OnMousePosition;
             @MousePosition.performed += instance.OnMousePosition;
             @MousePosition.canceled += instance.OnMousePosition;
@@ -476,6 +531,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Quit.started += instance.OnQuit;
             @Quit.performed += instance.OnQuit;
             @Quit.canceled += instance.OnQuit;
+            @RightClick.started += instance.OnRightClick;
+            @RightClick.performed += instance.OnRightClick;
+            @RightClick.canceled += instance.OnRightClick;
         }
 
         /// <summary>
@@ -487,6 +545,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// <seealso cref="GameActions" />
         private void UnregisterCallbacks(IGameActions instance)
         {
+            @MouseMovement.started -= instance.OnMouseMovement;
+            @MouseMovement.performed -= instance.OnMouseMovement;
+            @MouseMovement.canceled -= instance.OnMouseMovement;
             @MousePosition.started -= instance.OnMousePosition;
             @MousePosition.performed -= instance.OnMousePosition;
             @MousePosition.canceled -= instance.OnMousePosition;
@@ -508,6 +569,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Quit.started -= instance.OnQuit;
             @Quit.performed -= instance.OnQuit;
             @Quit.canceled -= instance.OnQuit;
+            @RightClick.started -= instance.OnRightClick;
+            @RightClick.performed -= instance.OnRightClick;
+            @RightClick.canceled -= instance.OnRightClick;
         }
 
         /// <summary>
@@ -548,6 +612,13 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     /// <seealso cref="GameActions.RemoveCallbacks(IGameActions)" />
     public interface IGameActions
     {
+        /// <summary>
+        /// Method invoked when associated input action "MouseMovement" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMouseMovement(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "MousePosition" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -597,5 +668,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnQuit(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightClick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightClick(InputAction.CallbackContext context);
     }
 }
