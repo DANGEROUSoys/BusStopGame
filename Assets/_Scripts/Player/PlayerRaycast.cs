@@ -49,6 +49,8 @@ public class PlayerRaycast : MonoBehaviour
             {
                 if (hit.collider.TryGetComponent<IInteractive>(out IInteractive interactiveObject))
                 {
+                    if (_currentInteractiveObject != null)
+                        _currentInteractiveObject.StopHitInteraction();
                     _currentInteractiveObject = interactiveObject;
                     _currentInteractiveObject.StartHitInteraction();
 

@@ -32,8 +32,4 @@ public class Backpack : MonoBehaviour, IInteractive
     {
         _backpackView.SetHighlight(false);
     }
-
-    public void StopInteract()
-    {
-    }
 }

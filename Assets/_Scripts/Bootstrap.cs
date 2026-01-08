@@ -1,11 +1,14 @@
 using UnityEngine;
 
+
 public class Bootstrap : MonoBehaviour
 {
     [SerializeField] private CameraMovement _cameraMovement;
     [SerializeField] private PlayerRaycast _playerRaycast;
     [SerializeField] private ShadowAnomaly _shadowAnomaly;
     [SerializeField] private Backpack _backpack;
+    [SerializeField] private Inventory.Inventory _inventory;
+    [SerializeField] private Dog _dog;
     private PlayerInput _input;
     private EventBus _eventBus;
 
@@ -19,10 +22,11 @@ public class Bootstrap : MonoBehaviour
         _playerRaycast.Initialize(_input, _eventBus);
         _playerRaycast.StartRaycast();
 
-        _shadowAnomaly.Initialize();
-        _shadowAnomaly.StartScreamerTimer();
-
         _backpack.Initialize(_input, _eventBus);
+
+        _inventory.Initialize(_eventBus);
+
+        InitializeAnomalies();
     }
 
     private void OnDisable()
@@ -37,5 +41,14 @@ public class Bootstrap : MonoBehaviour
 
         _eventBus = new EventBus();
         _eventBus.Initialize();
+    }
+
+    private void InitializeAnomalies()
+    {
+        _shadowAnomaly.Initialize();
+        _shadowAnomaly.StartScreamerTimer();
+
+        _dog.Initialize(_eventBus, _inventory);
+        _dog.Appear();
     }
 }

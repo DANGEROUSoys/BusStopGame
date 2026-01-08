@@ -90,9 +90,4 @@ public class ShadowAnomaly : MonoBehaviour, IInteractive
     {
         
     }
-
-    public void StopInteract()
-    {
-        
-    }
 }
