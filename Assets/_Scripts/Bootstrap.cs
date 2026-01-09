@@ -1,54 +1,69 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 
 public class Bootstrap : MonoBehaviour
 {
-    [SerializeField] private CameraMovement _cameraMovement;
-    [SerializeField] private PlayerRaycast _playerRaycast;
+    [SerializeField] private Player _player;
     [SerializeField] private ShadowAnomaly _shadowAnomaly;
     [SerializeField] private Backpack _backpack;
     [SerializeField] private Inventory.Inventory _inventory;
     [SerializeField] private Dog _dog;
     private PlayerInput _input;
     private EventBus _eventBus;
+    private List<IDisposable> _disposables;
 
     private void Awake()
     {
+        _disposables = new List<IDisposable>();
         InitializeServices();
-
-        _cameraMovement.Initialize(_input, _eventBus);
-        _cameraMovement.StartMovement();
-
-        _playerRaycast.Initialize(_input, _eventBus);
-        _playerRaycast.StartRaycast();
+        InitializePlayer();
 
         _backpack.Initialize(_input, _eventBus);
-
-        _inventory.Initialize(_eventBus);
+        _disposables.Add(_backpack);
 
         InitializeAnomalies();
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
-        _input.Disable();
+        foreach (var disposable in _disposables)
+        {
+            disposable.Dispose();
+        }
+        _disposables.Clear();
+        _eventBus.Dispose();
     }
 
     private void InitializeServices()
     {
         _input = new PlayerInput();
         _input.Enable();
+        _disposables.Add(_input);
 
         _eventBus = new EventBus();
         _eventBus.Initialize();
+    }
+
+    private void InitializePlayer()
+    {
+        _player.Initialize(_input, _eventBus);
+        _player.EnableCameraMovement();
+        _player.EnableRaycast();
+        _disposables.Add(_player);
+
+        _inventory.Initialize(_eventBus);
+        _disposables.Add(_inventory);
     }
 
     private void InitializeAnomalies()
     {
         _shadowAnomaly.Initialize();
         _shadowAnomaly.StartScreamerTimer();
+        _disposables.Add(_shadowAnomaly);
 
-        _dog.Initialize(_eventBus, _inventory);
+        _dog.Initialize(_eventBus);
         _dog.Appear();
+        _disposables.Add(_dog);
     }
 }

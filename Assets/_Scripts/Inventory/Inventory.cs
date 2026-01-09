@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Inventory
 {
-    public class Inventory : MonoBehaviour
+    public class Inventory : MonoBehaviour, IDisposable
     {
         [SerializeField] private short _maxBonesCount;
         [SerializeField] private float _maxEnergyDrinksCount;
@@ -21,17 +21,14 @@ namespace Inventory
             _bonesCount = 0;
             _energyDrinksCount = 0;
 
+            _eventBus.Subscribe<DogWasInteracted, short>(GetBonesCount);
             _eventBus.Subscribe<BoneMiniGameWasComplited>(IncreaseBonesCount);
             _eventBus.Subscribe<DogWasFed>(DecreaseBonesCount);
         }
 
-        private void OnDisable()
+        private short GetBonesCount()
         {
-            if (_eventBus != null)
-            {
-                _eventBus.UnSubscribe<BoneMiniGameWasComplited>(IncreaseBonesCount);
-                _eventBus.UnSubscribe<DogWasFed>(DecreaseBonesCount);
-            }
+            return _bonesCount;
         }
 
         private void IncreaseBonesCount()
@@ -42,7 +39,7 @@ namespace Inventory
                 _inventoryView.SetBonesCount(_bonesCount);
             }
             else
-                Debug.Log("Количество костей уже максимальное! Это странно.");
+                Debug.Log("РљРѕР»Р»РёС‡РµСЃС‚РІРѕ РєРѕСЃС‚РµР№ СѓР¶Рµ РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ!");
         }
         private void DecreaseBonesCount()
         {
@@ -54,8 +51,14 @@ namespace Inventory
             else
             {
                 _bonesCount = 0;
-                Debug.Log("Количество костей равно нулю!");
+                Debug.Log("РљРѕР»Р»РёС‡РµСЃС‚РІРѕ РєРѕСЃС‚РµР№: 0!");
             }
+        }
+
+        public void Dispose()
+        {
+            _eventBus.UnSubscribe<BoneMiniGameWasComplited>(IncreaseBonesCount);
+            _eventBus.UnSubscribe<DogWasFed>(DecreaseBonesCount);
         }
     }
 }

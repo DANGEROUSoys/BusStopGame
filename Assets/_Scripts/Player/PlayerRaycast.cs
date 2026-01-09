@@ -1,45 +1,54 @@
 using System.Collections;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class PlayerRaycast : MonoBehaviour
+public class PlayerRaycast
 {
+    private CancellationTokenSource _raycastTokenSource;
     private PlayerInput _input;
     private EventBus _eventBus;
-    private Coroutine _raycastUpdate;
     private Camera _camera;
-
     private IInteractive _currentInteractiveObject;
 
-    public void Initialize(PlayerInput input, EventBus eventBus)
+    public PlayerRaycast(PlayerInput input, EventBus eventBus, Camera camera)
     {
         _input = input;
         _eventBus = eventBus;
-        _camera = Camera.main;
+        _camera = camera;
         _currentInteractiveObject = null;
+        _raycastTokenSource?.Dispose();
+        _raycastTokenSource = null;
 
         _eventBus.Subscribe<BackpackWasEnabled>(StopRaycast);
         _eventBus.Subscribe<BackpackWasDisabled>(StartRaycast);
     }
 
-    private void OnDisable()
+    public void Dispose()
     {
+        _raycastTokenSource?.Dispose();
         _eventBus.UnSubscribe<BackpackWasEnabled>(StopRaycast);
         _eventBus.UnSubscribe<BackpackWasDisabled>(StartRaycast);
     }
 
-    public void StartRaycast()
+    public async void StartRaycast()
     {
-        _raycastUpdate = StartCoroutine(RaycastUpdate());
+        if (_raycastTokenSource != null) return;
+
+        _raycastTokenSource = new CancellationTokenSource();
+        await RaycastUpdate(_raycastTokenSource.Token);
     }
 
     public void StopRaycast()
     {
-        StopCoroutine(_raycastUpdate);
+        _raycastTokenSource.Cancel();
+        _raycastTokenSource.Dispose();
+        _raycastTokenSource = null;
     }
     
-    private IEnumerator RaycastUpdate()
+    private async Task RaycastUpdate(CancellationToken token)
     {
-        while (true)
+        while (!token.IsCancellationRequested)
         {
             Vector2 mousePosition = _input.Game.MousePosition.ReadValue<Vector2>();
             Ray ray = _camera.ScreenPointToRay(mousePosition);
@@ -76,7 +85,7 @@ public class PlayerRaycast : MonoBehaviour
                     _currentInteractiveObject = null;
                 }
             }
-            yield return null;
+            await Task.Yield();
         }
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Backpack : MonoBehaviour, IInteractive
+public class Backpack : MonoBehaviour, IInteractive, IDisposable
 {
     [SerializeField] private BackpackView _backpackView;
     [SerializeField] private MiniGameSelectionMenu _miniGameSelectionMenu;
@@ -31,5 +31,10 @@ public class Backpack : MonoBehaviour, IInteractive
     public void StopHitInteraction()
     {
         _backpackView.SetHighlight(false);
+    }
+
+    public void Dispose()
+    {
+        
     }
 }

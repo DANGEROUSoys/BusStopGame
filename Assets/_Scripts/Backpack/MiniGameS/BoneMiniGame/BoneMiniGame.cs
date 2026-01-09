@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BoneMiniGame 
 { 
-    public class BoneMiniGame : MonoBehaviour
+    public class BoneMiniGame : MonoBehaviour, IDisposable
     {
         [SerializeField] private BoneMover _boneMover;
         [SerializeField] private FrameMovement _frameMovement;
@@ -59,6 +59,11 @@ namespace BoneMiniGame
                 }
                 yield return null;
             }
+        }
+
+        public void Dispose()
+        {
+            
         }
     }
 }

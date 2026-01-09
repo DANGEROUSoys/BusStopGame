@@ -1,23 +1,22 @@
 using UnityEngine;
 
-public class Dog : MonoBehaviour, IInteractive
+public class Dog : MonoBehaviour, IInteractive, IDisposable
 {
     [SerializeField] private DogView _dogView;
 
     private EventBus _eventBus;
-    private Inventory.Inventory _inventory; //ÇÀÂÈÑÈÌÎÑÒÜ, ÍÓÆÍÎ ÏÎÄÓÌÀÒÜ ÊÀÊ ÓÁĞÀÒÜ
     private Collider _collider;
-    private short _currentBonesCount => _inventory.BonesCount;
+    private short _currentBonesCount;
 
-    public void Initialize(EventBus eventBus, Inventory.Inventory inventory)
+    public void Initialize(EventBus eventBus)
     {
         _eventBus = eventBus;
-        _inventory = inventory;
         _collider = GetComponent<Collider>();
     }
 
     public void Interact()
     {
+        short _currentBonesCount = _eventBus.Request<DogWasInteracted, short>(new DogWasInteracted());
         if (_currentBonesCount > 0)
         {
             Leave();
@@ -38,7 +37,7 @@ public class Dog : MonoBehaviour, IInteractive
     public void Appear()
     {
         _dogView.ShowAppearanceAnimation();
-        _collider.enabled = true; // ÑÄÅËÀÒÜ ÂÊËŞ×ÅÍÈÅ ÊÎËËÀÉÄÅĞÀ ÏÎÑËÅ ÀÍÈÌÀÖÈÈ ÏÎßÂËÅÍÈß ÑÎÁÀÊÈ
+        _collider.enabled = true; 
     }
 
     private void Leave()
@@ -46,5 +45,10 @@ public class Dog : MonoBehaviour, IInteractive
         _collider.enabled = false;
         _dogView.SetHighlight(false);
         _dogView.ShowLeavingAnimation();
+    }
+
+    public void Dispose()
+    {
+        
     }
 }

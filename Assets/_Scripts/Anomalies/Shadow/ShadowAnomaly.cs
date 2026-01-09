@@ -1,35 +1,41 @@
 using System.Collections;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class ShadowAnomaly : MonoBehaviour, IInteractive
+public class ShadowAnomaly : MonoBehaviour, IInteractive, IDisposable
 {
-    // ЛУЧШЕ ПОТОМ ПЕРЕДЕЛАТЬ ЛОГИКУ ЧЕРЕЗ ПАТТЕРН STATE MACHINE
     [SerializeField] private float _timeBeforeScreamer;
     [SerializeField] private float _stoppingTimerSpeed;
     [SerializeField] private ShadowAnomalyView _shadowAnomalyView;
     private float _currentTime;
 
-    private Coroutine _screamerTimer;
-    private Coroutine _timerStopping;
+    private CancellationTokenSource _screamerTokenSource;
+    private CancellationTokenSource _stoppingTokenSource;
 
     public void Initialize()
     {
         _currentTime = 0;
-        _screamerTimer = null;
+        _screamerTokenSource?.Dispose();
+        _stoppingTokenSource?.Dispose();
+        _screamerTokenSource = null;
+        _stoppingTokenSource = null;
         _shadowAnomalyView.Initialize(_timeBeforeScreamer);
     }
 
-    public void StartScreamerTimer()
+    public async void StartScreamerTimer()
     {
-        if (_screamerTimer == null)
-            _screamerTimer = StartCoroutine(ScreamerTimer());
+        if (_screamerTokenSource != null) return;
+        
+        _screamerTokenSource = new CancellationTokenSource();
+        await ScreamerTimer(_screamerTokenSource.Token);
     }
 
     public void StopScreamerTimer()
     {
-        if (_screamerTimer != null)
-            StopCoroutine(_screamerTimer);
-        _screamerTimer = null;
+        _screamerTokenSource?.Cancel();
+        _screamerTokenSource?.Dispose();
+        _screamerTokenSource = null;
     }
 
     public void StartHitInteraction()
@@ -43,21 +49,24 @@ public class ShadowAnomaly : MonoBehaviour, IInteractive
         StartScreamerTimer();
     }
 
-    public void StartTimerStopping()
+    public async void StartTimerStopping()
     {
-        if (_timerStopping == null)
-            _timerStopping = StartCoroutine(TimerStopping());
-    }
-    public void StopTimerStopping()
-    {
-        if (_timerStopping != null)
-            StopCoroutine(_timerStopping);
-        _timerStopping = null;
+        if (_stoppingTokenSource != null) return;
+        
+        _stoppingTokenSource = new CancellationTokenSource();
+        await TimerStopping(_stoppingTokenSource.Token);
     }
 
-    private IEnumerator ScreamerTimer()
+    public void StopTimerStopping()
     {
-        while (true)
+        _stoppingTokenSource?.Cancel();
+        _stoppingTokenSource?.Dispose();
+        _stoppingTokenSource = null;
+    }
+
+    private async Task ScreamerTimer(CancellationToken token)
+    {
+        while (!token.IsCancellationRequested)
         {
             _currentTime += Time.deltaTime;
 
@@ -66,28 +75,36 @@ public class ShadowAnomaly : MonoBehaviour, IInteractive
                 Debug.Log("Игрок проиграл от тени. Нужно послать эвент об этом!");
                 StopScreamerTimer();
             }
+            
             _shadowAnomalyView.ChangeShadowScale(_currentTime);
-
-            //Debug.Log(_currentTime);
-            yield return null;
+            await Task.Yield();
         }
     }
-    private IEnumerator TimerStopping()
+
+    private async Task TimerStopping(CancellationToken token)
     {
-        while (true)
+        while (!token.IsCancellationRequested)
         {
             _currentTime -= Time.deltaTime * _stoppingTimerSpeed;
 
-            if(_currentTime < 0)
+            if (_currentTime < 0)
                 _currentTime = 0;
+            
             _shadowAnomalyView.ChangeShadowScale(_currentTime);
-
-            yield return null;
+            await Task.Yield();
         }
     }
 
     public void Interact()
     {
         
+    }
+
+    public void Dispose()
+    {
+        _screamerTokenSource?.Cancel();
+        _stoppingTokenSource?.Cancel();
+        _screamerTokenSource?.Dispose();
+        _stoppingTokenSource?.Dispose();
     }
 }

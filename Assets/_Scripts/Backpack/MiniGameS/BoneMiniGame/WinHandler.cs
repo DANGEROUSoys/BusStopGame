@@ -64,7 +64,7 @@ namespace BoneMiniGame
                     StopUpdate();
                     _eventBus.Invoke(new BoneMiniGameWasComplited());
                     
-                    Debug.Log("Игрок прошёл мини-игру. Нужно отправить эвент об этом!");
+                    Debug.Log("РњРёРЅРё-РёРіСЂР° СЃ РєРѕСЃС‚РѕС‡РєРѕР№ РІС‹РїРѕР»РЅРµРЅР°! РќСѓР¶РЅРѕ РїРѕСЃР»Р°С‚СЊ СЌРІРµРЅС‚ РѕР± СЌС‚РѕРј.");
                 }
                 yield return null;
             }
