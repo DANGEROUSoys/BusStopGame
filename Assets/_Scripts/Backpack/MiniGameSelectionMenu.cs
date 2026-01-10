@@ -1,27 +1,45 @@
 using System.Collections;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class MiniGameSelectionMenu : MonoBehaviour
+public class MiniGameSelectionMenu : MonoBehaviour, IDisposable
 {
+    [SerializeField] private GameObject _activeBoneMiniGameButton;
+    [SerializeField] private GameObject _inactiveBoneMiniGameButton;
+    [SerializeField] private GameObject _activeEnergyDrinkMiniGameButton;
+    [SerializeField] private GameObject _inactiveEnergyDrinkMiniGameButton;
     [SerializeField] private GameObject _menu;
     [SerializeField] private BoneMiniGame.BoneMiniGame _boneMiniGame;
     private PlayerInput _input;
     private EventBus _eventBus;
-    private Coroutine _selectionMenuUpdate;
+    private CancellationTokenSource _menuUpdateTokenSource;
 
     public void Initialize(PlayerInput input, EventBus eventBus)
     {
         _input = input;
         _eventBus = eventBus;
+        _menuUpdateTokenSource?.Dispose();
+        _menuUpdateTokenSource = null;
 
         _boneMiniGame.Initialize(_input, _eventBus);
     }
-    public void StartSelectionMenu()
+
+    public void Dispose()
+    {
+        _menuUpdateTokenSource?.Cancel();
+        _menuUpdateTokenSource?.Dispose();
+        _menuUpdateTokenSource = null;
+    }
+
+    public async void StartSelectionMenu()
     {
         _menu.SetActive(true);
+        ShowButtons();
 
-        if (_selectionMenuUpdate == null)
-            _selectionMenuUpdate = StartCoroutine(SelectionMenuUpdate());
+        if (_menuUpdateTokenSource != null) return;
+        _menuUpdateTokenSource = new CancellationTokenSource();
+        await SelectionMenuUpdate(_menuUpdateTokenSource.Token);
     }
 
     public void StopSelectionMenu()
@@ -34,9 +52,9 @@ public class MiniGameSelectionMenu : MonoBehaviour
     {
         _menu.SetActive(false);
 
-        if (_selectionMenuUpdate != null)
-            StopCoroutine(_selectionMenuUpdate);
-        _selectionMenuUpdate = null;
+        _menuUpdateTokenSource?.Cancel();
+        _menuUpdateTokenSource?.Dispose();
+        _menuUpdateTokenSource = null;
     }
 
     public void StartBoneMiniGame()
@@ -45,15 +63,45 @@ public class MiniGameSelectionMenu : MonoBehaviour
         _boneMiniGame.StartGame();
     }
     
-    private IEnumerator SelectionMenuUpdate()
+    private async Task SelectionMenuUpdate(CancellationToken token)
     {
-        while (true)
+        while (!token.IsCancellationRequested)
         {
             if (_input.Game.Quit.WasPressedThisFrame())
             {
                 StopSelectionMenu();
             }
-            yield return null;
+            await Task.Yield();
+        }
+    }
+
+    private void ShowButtons()
+    {
+        short bones = _eventBus.Request<GetBonesCount, short>(new GetBonesCount());
+        short energyDrinks = _eventBus.Request<GetEnergyDrinksCount, short>(new GetEnergyDrinksCount());
+        short maxBones = _eventBus.Request<GetMaxBonesCount, short>(new GetMaxBonesCount());
+        short maxEnergyDrinks = _eventBus.Request<GetMaxEnergyDrinksCount, short>(new GetMaxEnergyDrinksCount());
+
+        if(bones < maxBones)
+        {
+            _activeBoneMiniGameButton.SetActive(true);
+            _inactiveBoneMiniGameButton.SetActive(false);
+        }
+        else
+        {
+            _activeBoneMiniGameButton.SetActive(false);
+            _inactiveBoneMiniGameButton.SetActive(true);
+        }
+
+        if(energyDrinks < maxEnergyDrinks)
+        {
+            _activeEnergyDrinkMiniGameButton.SetActive(true);
+            _inactiveEnergyDrinkMiniGameButton.SetActive(false);
+        }
+        else
+        {
+            _activeEnergyDrinkMiniGameButton.SetActive(false);
+            _inactiveEnergyDrinkMiniGameButton.SetActive(true);
         }
     }
 }

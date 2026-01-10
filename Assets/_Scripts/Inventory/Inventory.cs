@@ -5,14 +5,11 @@ namespace Inventory
     public class Inventory : MonoBehaviour, IDisposable
     {
         [SerializeField] private short _maxBonesCount;
-        [SerializeField] private float _maxEnergyDrinksCount;
+        [SerializeField] private short _maxEnergyDrinksCount;
         [SerializeField] private InventoryView _inventoryView;
         private short _bonesCount;
         private short _energyDrinksCount;
         private EventBus _eventBus;
-
-        public short BonesCount => _bonesCount;
-        public short EnergyDrinksCount => _energyDrinksCount;
 
         public void Initialize(EventBus eventBus)
         {
@@ -21,15 +18,18 @@ namespace Inventory
             _bonesCount = 0;
             _energyDrinksCount = 0;
 
-            _eventBus.Subscribe<DogWasInteracted, short>(GetBonesCount);
+            _eventBus.Subscribe<GetBonesCount, short>(GetBonesCount);
+            _eventBus.Subscribe<GetEnergyDrinksCount, short>(GetEnergyDrinksCount);
+            _eventBus.Subscribe<GetMaxBonesCount, short>(GetMaxBonesCount);
+            _eventBus.Subscribe<GetMaxEnergyDrinksCount, short>(GetMaxEnergyDrinksCount);
             _eventBus.Subscribe<BoneMiniGameWasComplited>(IncreaseBonesCount);
             _eventBus.Subscribe<DogWasFed>(DecreaseBonesCount);
         }
 
-        private short GetBonesCount()
-        {
-            return _bonesCount;
-        }
+        public short GetBonesCount() => _bonesCount;
+        public short GetEnergyDrinksCount() => _energyDrinksCount;
+        public short GetMaxBonesCount() => _maxBonesCount;
+        public short GetMaxEnergyDrinksCount() => _maxEnergyDrinksCount;
 
         private void IncreaseBonesCount()
         {
@@ -57,6 +57,10 @@ namespace Inventory
 
         public void Dispose()
         {
+            _eventBus.UnSubscribe<GetBonesCount, short>(GetBonesCount);
+            _eventBus.UnSubscribe<GetEnergyDrinksCount, short>(GetEnergyDrinksCount);
+            _eventBus.UnSubscribe<GetMaxBonesCount, short>(GetMaxBonesCount);
+            _eventBus.UnSubscribe<GetMaxEnergyDrinksCount, short>(GetMaxEnergyDrinksCount);
             _eventBus.UnSubscribe<BoneMiniGameWasComplited>(IncreaseBonesCount);
             _eventBus.UnSubscribe<DogWasFed>(DecreaseBonesCount);
         }

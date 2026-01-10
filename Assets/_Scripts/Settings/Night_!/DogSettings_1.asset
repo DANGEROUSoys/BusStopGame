@@ -9,10 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 921375389b702434e90519cf26dd2dad, type: 3}
-  m_Name: CameraMovementSettings
+  m_Script: {fileID: 11500000, guid: 76ee07b224bd9c649b6272e618c85c7b, type: 3}
+  m_Name: DogSettings_1
   m_EditorClassIdentifier: 
-  RightLimitAngle: 60
-  LeftLimitAngle: -60
-  EdgeThreshold: 30
-  Speed: 35
+  _timeToFirstAppearing: {x: 0, y: 0}

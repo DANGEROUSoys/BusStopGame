@@ -1,20 +1,15 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "CameraMovementSettings", menuName = "Game/Camera Movement Settings")]
+[CreateAssetMenu(fileName = "CameraMovementSettings", menuName = "Settings/Camera Movement Settings")]
 public class CameraMovementSettings : ScriptableObject
 {
     [Header("Rotation Limits")]
-    [SerializeField] private float _rightLimitAngle = 30f;
-    [SerializeField] private float _leftLimitAngle = -30f;
+    [field: SerializeField] public float RightLimitAngle = 30f;
+    [field: SerializeField] public float LeftLimitAngle = -30f;
     
     [Header("Mouse Edge Detection")]
-    [SerializeField] private float _edgeThreshold = 50f;
+    [field: SerializeField] public float EdgeThreshold = 50f;
     
     [Header("Movement")]
-    [SerializeField] private float _speed = 100f;
-
-    public float RightLimitAngle => _rightLimitAngle;
-    public float LeftLimitAngle => _leftLimitAngle;
-    public float EdgeThreshold => _edgeThreshold;
-    public float Speed => _speed;
+    [field: SerializeField] public float Speed = 100f;
 }

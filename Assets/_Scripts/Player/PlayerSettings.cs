@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "PlayerSettings", menuName = "Game/Player Settings")]
+[CreateAssetMenu(fileName = "PlayerSettings", menuName = "Settings/Player Settings")]
 public class PlayerSettings : ScriptableObject
 {
-    public CameraMovementSettings CameraMovementSettings;
+    [field: SerializeField] public CameraMovementSettings CameraMovementSettings;
 }

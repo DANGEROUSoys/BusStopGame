@@ -6,7 +6,6 @@ public class Dog : MonoBehaviour, IInteractive, IDisposable
 
     private EventBus _eventBus;
     private Collider _collider;
-    private short _currentBonesCount;
 
     public void Initialize(EventBus eventBus)
     {
@@ -16,10 +15,9 @@ public class Dog : MonoBehaviour, IInteractive, IDisposable
 
     public void Interact()
     {
-        short _currentBonesCount = _eventBus.Request<DogWasInteracted, short>(new DogWasInteracted());
+        short _currentBonesCount = _eventBus.Request<GetBonesCount, short>(new GetBonesCount());
         if (_currentBonesCount > 0)
         {
-            Leave();
             _eventBus.Invoke(new DogWasFed());
         }
     }
@@ -36,12 +34,14 @@ public class Dog : MonoBehaviour, IInteractive, IDisposable
 
     public void Appear()
     {
+        Debug.Log("Собака появилась!");
         _dogView.ShowAppearanceAnimation();
         _collider.enabled = true; 
     }
 
-    private void Leave()
+    public void Leave()
     {
+        Debug.Log("Собака ушла!");
         _collider.enabled = false;
         _dogView.SetHighlight(false);
         _dogView.ShowLeavingAnimation();

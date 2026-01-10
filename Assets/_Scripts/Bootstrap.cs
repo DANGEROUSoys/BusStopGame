@@ -8,7 +8,7 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private ShadowAnomaly _shadowAnomaly;
     [SerializeField] private Backpack _backpack;
     [SerializeField] private Inventory.Inventory _inventory;
-    [SerializeField] private Dog _dog;
+    [SerializeField] private DogHandler _dogHandler;
     private PlayerInput _input;
     private EventBus _eventBus;
     private List<IDisposable> _disposables;
@@ -62,8 +62,8 @@ public class Bootstrap : MonoBehaviour
         _shadowAnomaly.StartScreamerTimer();
         _disposables.Add(_shadowAnomaly);
 
-        _dog.Initialize(_eventBus);
-        _dog.Appear();
-        _disposables.Add(_dog);
+        _dogHandler.Initialize(_eventBus);
+        _dogHandler.StartDogHandlerUpdate();
+        _disposables.Add(_dogHandler);
     }
 }

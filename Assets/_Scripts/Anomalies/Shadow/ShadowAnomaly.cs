@@ -102,9 +102,7 @@ public class ShadowAnomaly : MonoBehaviour, IInteractive, IDisposable
 
     public void Dispose()
     {
-        _screamerTokenSource?.Cancel();
-        _stoppingTokenSource?.Cancel();
-        _screamerTokenSource?.Dispose();
-        _stoppingTokenSource?.Dispose();
+        StopTimerStopping();
+        StopScreamerTimer();
     }
 }

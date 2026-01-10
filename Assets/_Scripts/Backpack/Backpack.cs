@@ -35,6 +35,6 @@ public class Backpack : MonoBehaviour, IInteractive, IDisposable
 
     public void Dispose()
     {
-        
+        _miniGameSelectionMenu.Dispose();
     }
 }
