@@ -1,16 +1,22 @@
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class Dog : MonoBehaviour, IInteractive, IDisposable
+public class Dog : MonoBehaviour, IStateSwitcher, IInteractive, IDisposable
 {
     [SerializeField] private DogView _dogView;
+    [SerializeField] private DogSettings _dogSettings;
 
     private EventBus _eventBus;
     private Collider _collider;
+    private CancellationTokenSource _screamerTokenSource;
+    private IDogState _currentState;
 
     public void Initialize(EventBus eventBus)
     {
         _eventBus = eventBus;
         _collider = GetComponent<Collider>();
+        StopScreamerTimer();
     }
 
     public void Interact()
@@ -34,21 +40,56 @@ public class Dog : MonoBehaviour, IInteractive, IDisposable
 
     public void Appear()
     {
-        Debug.Log("Собака появилась!");
         _dogView.ShowAppearanceAnimation();
-        _collider.enabled = true; 
+        _collider.enabled = true;
+        StartScreamerTimer();
     }
 
     public void Leave()
     {
-        Debug.Log("Собака ушла!");
         _collider.enabled = false;
         _dogView.SetHighlight(false);
         _dogView.ShowLeavingAnimation();
+        StopScreamerTimer();
+    }
+
+    private async void StartScreamerTimer()
+    {
+        if (_screamerTokenSource != null) return;
+        SwitchState(new DogBarkingState(this, _dogSettings, _eventBus));
+
+        _screamerTokenSource = new CancellationTokenSource();
+        await ScreamerTimer(_screamerTokenSource.Token);
+    }
+    private async void StopScreamerTimer()
+    {
+        _screamerTokenSource?.Cancel();
+        _screamerTokenSource?.Dispose();
+        _screamerTokenSource = null;
+    }
+
+    private async Task ScreamerTimer(CancellationToken token)
+    {
+        while (!token.IsCancellationRequested)
+        {
+            _currentState.Update();
+            await Task.Yield();
+        }
+    }
+
+    public void SwitchState(IDogState newState)
+    {
+        if(_currentState != null)
+            _currentState.Exit();
+        _currentState = newState;
+        _currentState.Enter();
     }
 
     public void Dispose()
     {
-        
+        StopScreamerTimer();
+        _collider = null;
+        _eventBus = null;
     }
+
 }

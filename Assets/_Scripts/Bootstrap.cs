@@ -11,6 +11,7 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private DogHandler _dogHandler;
     private PlayerInput _input;
     private EventBus _eventBus;
+    private ScreamerHandler _screamerHandler;
     private List<IDisposable> _disposables;
 
     private void Awake()
@@ -43,6 +44,9 @@ public class Bootstrap : MonoBehaviour
 
         _eventBus = new EventBus();
         _eventBus.Initialize();
+        
+        _screamerHandler = new ScreamerHandler(_eventBus);
+        _disposables.Add(_screamerHandler);
     }
 
     private void InitializePlayer()
@@ -58,7 +62,7 @@ public class Bootstrap : MonoBehaviour
 
     private void InitializeAnomalies()
     {
-        _shadowAnomaly.Initialize();
+        _shadowAnomaly.Initialize(_eventBus);
         _shadowAnomaly.StartScreamerTimer();
         _disposables.Add(_shadowAnomaly);
 

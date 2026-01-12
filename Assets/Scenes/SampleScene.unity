@@ -3735,7 +3735,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &743091879
 Transform:
   m_ObjectHideFlags: 0
@@ -4177,6 +4177,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dog: {fileID: 1691291741}
+  _settings: {fileID: 11400000, guid: 488f05808297da6428ca63404990f227, type: 2}
 --- !u!1 &773294075
 GameObject:
   m_ObjectHideFlags: 0
@@ -7849,6 +7850,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dogView: {fileID: 1161432007}
+  _dogSettings: {fileID: 11400000, guid: 53fa020f06393d84d8fd829a1dbccbae, type: 2}
 --- !u!4 &1709531975 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1d1981d97222ad940a6617d85cf4b7da, type: 3}

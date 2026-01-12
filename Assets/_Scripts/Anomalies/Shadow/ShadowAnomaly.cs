@@ -8,13 +8,15 @@ public class ShadowAnomaly : MonoBehaviour, IInteractive, IDisposable
     [SerializeField] private float _timeBeforeScreamer;
     [SerializeField] private float _stoppingTimerSpeed;
     [SerializeField] private ShadowAnomalyView _shadowAnomalyView;
+    private EventBus _eventBus;
     private float _currentTime;
 
     private CancellationTokenSource _screamerTokenSource;
     private CancellationTokenSource _stoppingTokenSource;
 
-    public void Initialize()
+    public void Initialize(EventBus eventBus)
     {
+        _eventBus = eventBus;
         _currentTime = 0;
         _screamerTokenSource?.Dispose();
         _stoppingTokenSource?.Dispose();
@@ -72,7 +74,8 @@ public class ShadowAnomaly : MonoBehaviour, IInteractive, IDisposable
 
             if (_currentTime > _timeBeforeScreamer)
             {
-                Debug.Log("Игрок проиграл от тени. Нужно послать эвент об этом!");
+                Debug.Log("Игрок проиграл от: ТЕНИ.");
+                _eventBus.Invoke(new ShadowScreamerEvent());
                 StopScreamerTimer();
             }
             

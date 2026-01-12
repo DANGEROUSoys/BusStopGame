@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class PlayerRaycast
+public class PlayerRaycast : IDisposable
 {
     private CancellationTokenSource _raycastTokenSource;
     private PlayerInput _input;
@@ -16,9 +16,7 @@ public class PlayerRaycast
         _input = input;
         _eventBus = eventBus;
         _camera = camera;
-        _currentInteractiveObject = null;
-        _raycastTokenSource?.Dispose();
-        _raycastTokenSource = null;
+        StopRaycast();
 
         _eventBus.Subscribe<BackpackWasEnabled>(StopRaycast);
         _eventBus.Subscribe<BackpackWasDisabled>(StartRaycast);
@@ -26,7 +24,7 @@ public class PlayerRaycast
 
     public void Dispose()
     {
-        _raycastTokenSource?.Dispose();
+        StopRaycast();
         _eventBus.UnSubscribe<BackpackWasEnabled>(StopRaycast);
         _eventBus.UnSubscribe<BackpackWasDisabled>(StartRaycast);
     }
@@ -41,8 +39,8 @@ public class PlayerRaycast
 
     public void StopRaycast()
     {
-        _raycastTokenSource.Cancel();
-        _raycastTokenSource.Dispose();
+        _raycastTokenSource?.Cancel();
+        _raycastTokenSource?.Dispose();
         _raycastTokenSource = null;
     }
     

@@ -6,7 +6,7 @@ using UnityEngine;
 public class DogHandler : MonoBehaviour, IDisposable
 {
     [SerializeField] private Dog _dog;
-    [SerializeField] private DogSettings _settings;
+    [SerializeField] private DogHandlerSettings _settings;
     private EventBus _eventBus;
     private CancellationTokenSource _handlerUpdateTokenSource;
     private bool _isFirstAppearing;
@@ -63,7 +63,6 @@ public class DogHandler : MonoBehaviour, IDisposable
         while (!token.IsCancellationRequested)
         {
             timer += Time.deltaTime;
-            Debug.Log(timer);
             if (timer >= timeToAppearingInSeconds)
             {
                 ActivateDog();
