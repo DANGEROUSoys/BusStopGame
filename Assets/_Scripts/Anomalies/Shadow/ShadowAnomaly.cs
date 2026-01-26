@@ -98,6 +98,11 @@ public class ShadowAnomaly : MonoBehaviour, IInteractive, IDisposable
         }
     }
 
+    public void Appear()
+    {
+        
+    }
+
     public void Interact()
     {
         

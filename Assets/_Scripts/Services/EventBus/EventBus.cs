@@ -7,7 +7,7 @@ public class EventBus : IDisposable
     private Dictionary<Type, List<object>> _receivers;
     private Dictionary<Type, List<object>> _requestReceivers;
 
-    public void Initialize()
+    public EventBus()
     {
         _receivers = new Dictionary<Type, List<object>>();
         _requestReceivers = new Dictionary<Type, List<object>>();

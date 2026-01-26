@@ -2,13 +2,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
+[RequireComponent(typeof(Collider),typeof(AudioSource))]
 public class Dog : MonoBehaviour, IStateSwitcher, IInteractive, IDisposable
 {
     [SerializeField] private DogView _dogView;
     [SerializeField] private DogSettings _dogSettings;
 
+    private DogData _dogData;
     private EventBus _eventBus;
     private Collider _collider;
+    private AudioSource _audioSource;
     private CancellationTokenSource _screamerTokenSource;
     private IDogState _currentState;
 
@@ -16,6 +19,8 @@ public class Dog : MonoBehaviour, IStateSwitcher, IInteractive, IDisposable
     {
         _eventBus = eventBus;
         _collider = GetComponent<Collider>();
+        _audioSource = GetComponent<AudioSource>();
+        _dogData = new DogData(_dogView, _dogSettings, _collider, _audioSource);
         StopScreamerTimer();
     }
 
@@ -40,6 +45,7 @@ public class Dog : MonoBehaviour, IStateSwitcher, IInteractive, IDisposable
 
     public void Appear()
     {
+        _eventBus.Invoke(new LightOffEvent());
         _dogView.ShowAppearanceAnimation();
         _collider.enabled = true;
         StartScreamerTimer();
@@ -47,6 +53,7 @@ public class Dog : MonoBehaviour, IStateSwitcher, IInteractive, IDisposable
 
     public void Leave()
     {
+        _eventBus.Invoke(new LightOffEvent());
         _collider.enabled = false;
         _dogView.SetHighlight(false);
         _dogView.ShowLeavingAnimation();
@@ -56,7 +63,7 @@ public class Dog : MonoBehaviour, IStateSwitcher, IInteractive, IDisposable
     private async void StartScreamerTimer()
     {
         if (_screamerTokenSource != null) return;
-        SwitchState(new DogBarkingState(this, _dogSettings, _eventBus));
+        SwitchState(new DogBarkingState(this, _dogData, _eventBus));
 
         _screamerTokenSource = new CancellationTokenSource();
         await ScreamerTimer(_screamerTokenSource.Token);

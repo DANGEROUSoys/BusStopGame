@@ -2,11 +2,11 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class ScreamerHandler : IDisposable
+public class ScreamerService : IDisposable
 {
     private EventBus _eventBus;
 
-    public ScreamerHandler(EventBus eventBus)
+    public ScreamerService(EventBus eventBus)
     {
         _eventBus = eventBus;
 

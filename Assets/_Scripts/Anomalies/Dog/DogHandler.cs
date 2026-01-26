@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class DogHandler : MonoBehaviour, IDisposable
 {
-    [SerializeField] private Dog _dog;
     [SerializeField] private DogHandlerSettings _settings;
+    private Dog _dog;
     private EventBus _eventBus;
     private CancellationTokenSource _handlerUpdateTokenSource;
     private bool _isFirstAppearing;
@@ -20,6 +20,7 @@ public class DogHandler : MonoBehaviour, IDisposable
         _isFirstAppearing = true;
         _isDogActivated = false;
 
+        _dog = GetComponent<Dog>();
         _dog.Initialize(_eventBus);
 
         _eventBus.Subscribe<DogWasFed>(DeactivateDog);

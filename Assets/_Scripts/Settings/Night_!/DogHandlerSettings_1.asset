@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76ee07b224bd9c649b6272e618c85c7b, type: 3}
   m_Name: DogHandlerSettings_1
   m_EditorClassIdentifier: 
-  MinTimeToFirstAppearingInSeconds: 25
-  MaxTimeToFirstAppearingInSeconds: 35
+  MinTimeToFirstAppearingInSeconds: 3
+  MaxTimeToFirstAppearingInSeconds: 3
   MinTimeToAppearingInSeconds: 35
   MaxTimeToAppearingInSeconds: 50

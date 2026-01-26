@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: DogSettings_1
   m_EditorClassIdentifier: 
   StageTime: 15
+  BarkingAudio: {fileID: 8300000, guid: 10804090e346e4b48857165d17178a89, type: 3}
+  GrowlingAudio: {fileID: 8300000, guid: 9e82f7e35bc32b540add7b88c84d96f8, type: 3}

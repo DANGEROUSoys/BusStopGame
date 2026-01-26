@@ -5,13 +5,15 @@ using UnityEngine;
 public class Bootstrap : MonoBehaviour
 {
     [SerializeField] private Player _player;
-    [SerializeField] private ShadowAnomaly _shadowAnomaly;
+    [SerializeField] private ShadowHandler _shadowHandler;
     [SerializeField] private Backpack _backpack;
     [SerializeField] private Inventory.Inventory _inventory;
     [SerializeField] private DogHandler _dogHandler;
+    [SerializeField] private LightHandler _lightHandler;
     private PlayerInput _input;
     private EventBus _eventBus;
-    private ScreamerHandler _screamerHandler;
+    private ScreamerService _screamerService;
+    private SoundService _soundService;
     private List<IDisposable> _disposables;
 
     private void Awake()
@@ -43,10 +45,15 @@ public class Bootstrap : MonoBehaviour
         _disposables.Add(_input);
 
         _eventBus = new EventBus();
-        _eventBus.Initialize();
         
-        _screamerHandler = new ScreamerHandler(_eventBus);
-        _disposables.Add(_screamerHandler);
+        _screamerService = new ScreamerService(_eventBus);
+        _disposables.Add(_screamerService);
+
+        _lightHandler.Initialize(_eventBus);
+        _disposables.Add(_lightHandler);
+
+        _soundService = new SoundService(_eventBus);
+        _disposables.Add(_screamerService);
     }
 
     private void InitializePlayer()
@@ -62,9 +69,9 @@ public class Bootstrap : MonoBehaviour
 
     private void InitializeAnomalies()
     {
-        _shadowAnomaly.Initialize(_eventBus);
-        _shadowAnomaly.StartScreamerTimer();
-        _disposables.Add(_shadowAnomaly);
+        _shadowHandler.Initialize(_eventBus);
+        //_shadowAnomaly.StartScreamerTimer();
+        _disposables.Add(_shadowHandler);
 
         _dogHandler.Initialize(_eventBus);
         _dogHandler.StartDogHandlerUpdate();
