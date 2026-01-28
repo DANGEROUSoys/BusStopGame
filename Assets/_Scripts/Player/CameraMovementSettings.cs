@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "CameraMovementSettings", menuName = "Settings/Camera Movement Settings")]
+[CreateAssetMenu(fileName = "CameraMovementSettings", menuName = "Settings/Player/Camera Movement Settings")]
 public class CameraMovementSettings : ScriptableObject
 {
     [Header("Rotation Limits")]

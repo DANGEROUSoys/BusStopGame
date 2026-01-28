@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[RequireComponent(typeof(Dog),typeof(DogView),typeof(Collider))]
 public class DogHandler : MonoBehaviour, IDisposable
 {
     [SerializeField] private DogHandlerSettings _settings;

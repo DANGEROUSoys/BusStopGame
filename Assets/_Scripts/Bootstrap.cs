@@ -5,6 +5,7 @@ using UnityEngine;
 public class Bootstrap : MonoBehaviour
 {
     [SerializeField] private Player _player;
+    [SerializeField] private Smartphone _smartphone;
     [SerializeField] private ShadowHandler _shadowHandler;
     [SerializeField] private Backpack _backpack;
     [SerializeField] private Inventory.Inventory _inventory;
@@ -65,12 +66,16 @@ public class Bootstrap : MonoBehaviour
 
         _inventory.Initialize(_eventBus);
         _disposables.Add(_inventory);
+
+        _smartphone.Initialize(_input);
+        _smartphone.StartSmartphoneUpdate();
+        _disposables.Add(_smartphone);
     }
 
     private void InitializeAnomalies()
     {
         _shadowHandler.Initialize(_eventBus);
-        //_shadowAnomaly.StartScreamerTimer();
+        _shadowHandler.StartShadowHandlerUpdate();
         _disposables.Add(_shadowHandler);
 
         _dogHandler.Initialize(_eventBus);

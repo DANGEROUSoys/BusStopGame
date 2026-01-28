@@ -3,13 +3,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
+[RequireComponent(typeof(ShadowAnomalyView),typeof(Collider))]
 public class ShadowAnomaly : MonoBehaviour, IInteractive, IDisposable
 {
-    [SerializeField] private float _timeBeforeScreamer;
-    [SerializeField] private float _stoppingTimerSpeed;
-    [SerializeField] private ShadowAnomalyView _shadowAnomalyView;
+    [SerializeField] private ShadowSettings _shadowSettings;
+    private ShadowAnomalyView _shadowAnomalyView;
     private EventBus _eventBus;
     private float _currentTime;
+    private Collider _collider;
 
     private CancellationTokenSource _screamerTokenSource;
     private CancellationTokenSource _stoppingTokenSource;
@@ -17,12 +18,15 @@ public class ShadowAnomaly : MonoBehaviour, IInteractive, IDisposable
     public void Initialize(EventBus eventBus)
     {
         _eventBus = eventBus;
+        _collider = GetComponent<Collider>();
+        _shadowAnomalyView = GetComponent<ShadowAnomalyView>();
+        _collider.enabled = false;
         _currentTime = 0;
         _screamerTokenSource?.Dispose();
         _stoppingTokenSource?.Dispose();
         _screamerTokenSource = null;
         _stoppingTokenSource = null;
-        _shadowAnomalyView.Initialize(_timeBeforeScreamer);
+        _shadowAnomalyView.Initialize(_shadowSettings.TimeBeforeScreamer);
     }
 
     public async void StartScreamerTimer()
@@ -72,7 +76,7 @@ public class ShadowAnomaly : MonoBehaviour, IInteractive, IDisposable
         {
             _currentTime += Time.deltaTime;
 
-            if (_currentTime > _timeBeforeScreamer)
+            if (_currentTime > _shadowSettings.TimeBeforeScreamer)
             {
                 Debug.Log("Игрок проиграл от: ТЕНИ.");
                 _eventBus.Invoke(new ShadowScreamerEvent());
@@ -88,7 +92,7 @@ public class ShadowAnomaly : MonoBehaviour, IInteractive, IDisposable
     {
         while (!token.IsCancellationRequested)
         {
-            _currentTime -= Time.deltaTime * _stoppingTimerSpeed;
+            _currentTime -= Time.deltaTime * _shadowSettings.StoppingTimerSpeed;
 
             if (_currentTime < 0)
                 _currentTime = 0;
@@ -100,7 +104,10 @@ public class ShadowAnomaly : MonoBehaviour, IInteractive, IDisposable
 
     public void Appear()
     {
-        
+        _eventBus.Invoke(new LightOffEvent());
+        _collider.enabled = true;
+        _shadowAnomalyView.ShowAppearingAnimation();
+        StartScreamerTimer();
     }
 
     public void Interact()

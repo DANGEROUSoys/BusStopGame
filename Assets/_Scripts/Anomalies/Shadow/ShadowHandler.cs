@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
+[RequireComponent(typeof(ShadowAnomaly),typeof(ShadowAnomalyView),typeof(Collider))]
 public class ShadowHandler : MonoBehaviour, IDisposable
 {
     [SerializeField] private ShadowHandlerSettings _settings;

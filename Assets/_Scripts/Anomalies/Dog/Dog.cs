@@ -2,13 +2,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-[RequireComponent(typeof(Collider),typeof(AudioSource))]
+[RequireComponent(typeof(Collider),typeof(AudioSource),typeof(DogView))]
 public class Dog : MonoBehaviour, IStateSwitcher, IInteractive, IDisposable
 {
-    [SerializeField] private DogView _dogView;
     [SerializeField] private DogSettings _dogSettings;
 
     private DogData _dogData;
+    private DogView _dogView;
     private EventBus _eventBus;
     private Collider _collider;
     private AudioSource _audioSource;
@@ -20,6 +20,7 @@ public class Dog : MonoBehaviour, IStateSwitcher, IInteractive, IDisposable
         _eventBus = eventBus;
         _collider = GetComponent<Collider>();
         _audioSource = GetComponent<AudioSource>();
+        _dogView = GetComponent<DogView>();
         _dogData = new DogData(_dogView, _dogSettings, _collider, _audioSource);
         StopScreamerTimer();
     }

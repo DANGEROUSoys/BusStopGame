@@ -1,8 +1,8 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "ShadowSettings", menuName = "Settings/Shadow Settings")]
+[CreateAssetMenu(fileName = "ShadowSettings", menuName = "Settings/Shadow/Shadow Settings")]
 public class ShadowSettings : ScriptableObject
 {
-    public int MinTimeToAppearingInSeconds;
-    public int MaxTimeToAppearingInSeconds;
+    public float TimeBeforeScreamer;
+    public float StoppingTimerSpeed;
 }
