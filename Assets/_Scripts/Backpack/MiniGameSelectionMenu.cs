@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class MiniGameSelectionMenu : MonoBehaviour, IDisposable
+public class MiniGameSelectionMenu : MonoBehaviour, IDisposable, IPauseHandler
 {
     [SerializeField] private GameObject _activeBoneMiniGameButton;
     [SerializeField] private GameObject _inactiveBoneMiniGameButton;
@@ -102,6 +102,18 @@ public class MiniGameSelectionMenu : MonoBehaviour, IDisposable
         {
             _activeEnergyDrinkMiniGameButton.SetActive(false);
             _inactiveEnergyDrinkMiniGameButton.SetActive(true);
+        }
+    }
+
+    public void SetPaused(GamePauseEvent gamePause)
+    {
+        if (gamePause.IsPaused)
+        {
+            StopSelectionMenu();
+        }
+        else
+        {
+            StartSelectionMenu();
         }
     }
 }

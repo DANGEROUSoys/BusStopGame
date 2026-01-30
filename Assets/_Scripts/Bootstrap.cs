@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Bootstrap : MonoBehaviour
 {
+    [SerializeField] private ProjectContext _projectContext; 
+    [SerializeField] private NightHandler _nightHandler;
     [SerializeField] private Player _player;
     [SerializeField] private Smartphone _smartphone;
     [SerializeField] private ShadowHandler _shadowHandler;
@@ -11,8 +13,6 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private Inventory.Inventory _inventory;
     [SerializeField] private DogHandler _dogHandler;
     [SerializeField] private LightHandler _lightHandler;
-    private PlayerInput _input;
-    private EventBus _eventBus;
     private ScreamerService _screamerService;
     private SoundService _soundService;
     private List<IDisposable> _disposables;
@@ -20,12 +20,11 @@ public class Bootstrap : MonoBehaviour
     private void Awake()
     {
         _disposables = new List<IDisposable>();
+        _projectContext.Initialize();
         InitializeServices();
+        InitializeNight();
         InitializePlayer();
-
-        _backpack.Initialize(_input, _eventBus);
-        _disposables.Add(_backpack);
-
+        InitializeBackpack();
         InitializeAnomalies();
     }
 
@@ -35,50 +34,57 @@ public class Bootstrap : MonoBehaviour
         {
             disposable.Dispose();
         }
+        _projectContext.Dispose(); // Убрать
         _disposables.Clear();
-        _eventBus.Dispose();
+    }
+
+    private void InitializeNight()
+    {
+        _nightHandler.Initialize();
+        _disposables.Add(_nightHandler);
+        _nightHandler.StartHandlerUpdate();
     }
 
     private void InitializeServices()
     {
-        _input = new PlayerInput();
-        _input.Enable();
-        _disposables.Add(_input);
-
-        _eventBus = new EventBus();
-        
-        _screamerService = new ScreamerService(_eventBus);
+        _screamerService = new ScreamerService();
         _disposables.Add(_screamerService);
 
-        _lightHandler.Initialize(_eventBus);
+        _lightHandler.Initialize();
         _disposables.Add(_lightHandler);
 
-        _soundService = new SoundService(_eventBus);
+        _soundService = new SoundService();
         _disposables.Add(_screamerService);
     }
 
     private void InitializePlayer()
     {
-        _player.Initialize(_input, _eventBus);
+        _player.Initialize();
         _player.EnableCameraMovement();
         _player.EnableRaycast();
         _disposables.Add(_player);
 
-        _inventory.Initialize(_eventBus);
+        _inventory.Initialize();
         _disposables.Add(_inventory);
 
-        _smartphone.Initialize(_input);
+        _smartphone.Initialize();
         _smartphone.StartSmartphoneUpdate();
         _disposables.Add(_smartphone);
     }
 
+    private void InitializeBackpack()
+    {
+        _backpack.Initialize();
+        _disposables.Add(_backpack);
+    }
+
     private void InitializeAnomalies()
     {
-        _shadowHandler.Initialize(_eventBus);
+        _shadowHandler.Initialize();
         _shadowHandler.StartShadowHandlerUpdate();
         _disposables.Add(_shadowHandler);
 
-        _dogHandler.Initialize(_eventBus);
+        _dogHandler.Initialize();
         _dogHandler.StartDogHandlerUpdate();
         _disposables.Add(_dogHandler);
     }

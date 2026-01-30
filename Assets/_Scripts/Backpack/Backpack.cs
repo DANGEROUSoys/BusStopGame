@@ -1,17 +1,24 @@
 using UnityEngine;
 
-public class Backpack : MonoBehaviour, IInteractive, IDisposable
+public class Backpack : MonoBehaviour, IInteractive, IDisposable, IPauseHandler
 {
     [SerializeField] private BackpackView _backpackView;
     [SerializeField] private MiniGameSelectionMenu _miniGameSelectionMenu;
-    private bool _backpackIsInteracted;
     private EventBus _eventBus;
+    private PlayerInput _input;
 
-    public void Initialize(PlayerInput input, EventBus eventBus)
+    public void Initialize()
     {
-        _eventBus = eventBus;
-        _miniGameSelectionMenu.Initialize(input, eventBus);
+        _input = ProjectContext.Instance.PlayerInput;
+        _eventBus = ProjectContext.Instance.EventBus; ;
+        _miniGameSelectionMenu.Initialize(_input, _eventBus);
 
+        _eventBus.Subscribe<GamePauseEvent>(SetPaused);
+    }
+    public void Dispose()
+    {
+        _eventBus.UnSubscribe<GamePauseEvent>(SetPaused);
+        _miniGameSelectionMenu.Dispose();
     }
 
     public void Interact()
@@ -19,7 +26,6 @@ public class Backpack : MonoBehaviour, IInteractive, IDisposable
         _eventBus.Invoke(new BackpackWasEnabled());
         _miniGameSelectionMenu.StartSelectionMenu();
 
-        _backpackIsInteracted = true;
         StopHitInteraction();
     }
 
@@ -33,8 +39,8 @@ public class Backpack : MonoBehaviour, IInteractive, IDisposable
         _backpackView.SetHighlight(false);
     }
 
-    public void Dispose()
+    public void SetPaused(GamePauseEvent gamePause)
     {
-        _miniGameSelectionMenu.Dispose();
+        
     }
 }

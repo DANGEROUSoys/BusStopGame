@@ -17,7 +17,7 @@ public class DogGrowlingState : IDogState
     {
         Debug.Log("Вход в стадию гавканья!");
         _timer = 0;
-        _eventBus.Invoke(new PlaySoundEvent(_dogData.AudioSource, _dogData.GrowlingAudio));
+        _eventBus.Invoke(new PlayAudioEvent(_dogData.AudioSource, _dogData.GrowlingAudio));
     }
     public void Update()
     {

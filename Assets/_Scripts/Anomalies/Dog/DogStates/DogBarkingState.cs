@@ -18,7 +18,7 @@ public class DogBarkingState : IDogState
     {
         Debug.Log("Вход в стадию лая");
         _timer = 0;
-        _eventBus.Invoke(new PlaySoundEvent(_dogData.AudioSource, _dogData.BarkingAudio));
+        _eventBus.Invoke(new PlayAudioEvent(_dogData.AudioSource, _dogData.BarkingAudio));
     }
     public void Update()
     {

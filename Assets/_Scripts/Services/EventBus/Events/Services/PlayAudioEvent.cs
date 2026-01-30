@@ -1,11 +1,11 @@
 using UnityEngine;
 
-public struct PlaySoundEvent : IEvent
+public struct PlayAudioEvent : IEvent
 {
     public AudioSource AudioSource;
     public AudioClip Clip;
     
-    public PlaySoundEvent(AudioSource audioSource, AudioClip clip)
+    public PlayAudioEvent(AudioSource audioSource, AudioClip clip)
     {
         AudioSource = audioSource;
         Clip = clip;

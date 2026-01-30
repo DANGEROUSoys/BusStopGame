@@ -22,12 +22,12 @@ namespace BoneMiniGame
         public void Initialize()
         {
             _boardersOffset = _frameTransform.rect.width / 2 + 10;
+            _frameTransform.anchoredPosition = new Vector2(0, 0);
+            SetNewTarget();
         }
 
         public void StartMoving()
         {
-            _frameTransform.anchoredPosition = new Vector2(0, 0);
-            SetNewTarget();
             _movingUpdate = StartCoroutine(Moving());
         }
 

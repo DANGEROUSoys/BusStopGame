@@ -11,9 +11,9 @@ namespace Inventory
         private short _energyDrinksCount;
         private EventBus _eventBus;
 
-        public void Initialize(EventBus eventBus)
+        public void Initialize()
         {
-            _eventBus = eventBus;
+            _eventBus = ProjectContext.Instance.EventBus;
 
             _bonesCount = 0;
             _energyDrinksCount = 0;
@@ -63,6 +63,7 @@ namespace Inventory
             _eventBus.UnSubscribe<GetMaxEnergyDrinksCount, short>(GetMaxEnergyDrinksCount);
             _eventBus.UnSubscribe<BoneMiniGameWasComplited>(IncreaseBonesCount);
             _eventBus.UnSubscribe<DogWasFed>(DecreaseBonesCount);
+            _eventBus = null;
         }
     }
 }

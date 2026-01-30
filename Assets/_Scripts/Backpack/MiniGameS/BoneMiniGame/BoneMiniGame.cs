@@ -2,8 +2,8 @@ using System.Collections;
 using UnityEngine;
 
 namespace BoneMiniGame 
-{ 
-    public class BoneMiniGame : MonoBehaviour, IDisposable
+{
+    public class BoneMiniGame : MonoBehaviour, IDisposable, IPauseHandler
     {
         [SerializeField] private BoneMover _boneMover;
         [SerializeField] private FrameMovement _frameMovement;
@@ -11,6 +11,7 @@ namespace BoneMiniGame
         private PlayerInput _input;
         private EventBus _eventBus;
         private Coroutine _mainUpdate;
+        private bool _isActive;
     
         public void Initialize(PlayerInput input, EventBus eventBus)
         {
@@ -21,13 +22,15 @@ namespace BoneMiniGame
             _frameMovement.Initialize();
             _winHandler.Initialize(_eventBus);
 
+            _eventBus.Subscribe<GamePauseEvent>(SetPaused);
             _eventBus.Subscribe<BoneMiniGameWasComplited>(StopGame);
         }
         public void StartGame()
         {
             gameObject.SetActive(true);
             Cursor.visible = false;
-    
+            _isActive = true;
+
             _mainUpdate = StartCoroutine(MainUpdate());
             _boneMover.StartMoving();
             _frameMovement.StartMoving();
@@ -46,6 +49,7 @@ namespace BoneMiniGame
     
             gameObject.SetActive(false);
             Cursor.visible = true;
+            _isActive = false;
             _eventBus.Invoke(new BackpackWasDisabled());
         }
     
@@ -63,7 +67,29 @@ namespace BoneMiniGame
 
         public void Dispose()
         {
-            
+            _eventBus.UnSubscribe<GamePauseEvent>(SetPaused);
+            _eventBus.UnSubscribe<BoneMiniGameWasComplited>(StopGame);
+            _input = null;
+            _eventBus = null;
+        }
+
+        public void SetPaused(GamePauseEvent gamePause)
+        {
+            if (_isActive)
+            {
+                if (gamePause.IsPaused)
+                {
+                    _boneMover.StopMoving();
+                    _frameMovement.StopMoving();
+                    _winHandler.StopUpdate();
+                }
+                else
+                {
+                    _boneMover.StartMoving();
+                    _frameMovement.StartMoving();
+                    _winHandler.StartUpdate();
+                }
+            }
         }
     }
 }

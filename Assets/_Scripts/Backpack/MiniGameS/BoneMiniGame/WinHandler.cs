@@ -25,7 +25,6 @@ namespace BoneMiniGame
 
         public void StartUpdate()
         {
-            _currentProgress = 0;
             _progressBar.SetProgress(_currentProgress);
 
             if (_timeForWin != 0)

@@ -6,9 +6,9 @@ public class ScreamerService : IDisposable
 {
     private EventBus _eventBus;
 
-    public ScreamerService(EventBus eventBus)
+    public ScreamerService()
     {
-        _eventBus = eventBus;
+        _eventBus = ProjectContext.Instance.EventBus;
 
         _eventBus.Subscribe<DogScreamerEvent>(PlayDogScreamer);
         _eventBus.Subscribe<ShadowScreamerEvent>(PlayShadowScreamer);
@@ -25,6 +25,8 @@ public class ScreamerService : IDisposable
 
     public void Dispose()
     {
-        
+        _eventBus.UnSubscribe<DogScreamerEvent>(PlayDogScreamer);
+        _eventBus.UnSubscribe<ShadowScreamerEvent>(PlayShadowScreamer);
+        _eventBus = null;
     }
 }

@@ -1,0 +1,17 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PauseService
+{
+    private EventBus _eventBus;
+
+    public PauseService()
+    {
+        _eventBus = ProjectContext.Instance.EventBus;
+    }
+
+    public void SetPaused(bool isPaused)
+    {
+        _eventBus.Invoke(new GamePauseEvent(isPaused));
+    }
+}

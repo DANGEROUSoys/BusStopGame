@@ -11,7 +11,7 @@ public class PlayerRaycast : IDisposable
     private Camera _camera;
     private IInteractive _currentInteractiveObject;
 
-    public PlayerRaycast(PlayerInput input, EventBus eventBus, Camera camera)
+    public PlayerRaycast(PlayerInput input,EventBus eventBus, Camera camera)
     {
         _input = input;
         _eventBus = eventBus;
@@ -27,6 +27,8 @@ public class PlayerRaycast : IDisposable
         StopRaycast();
         _eventBus.UnSubscribe<BackpackWasEnabled>(StopRaycast);
         _eventBus.UnSubscribe<BackpackWasDisabled>(StartRaycast);
+        _eventBus = null;
+        _input = null;
     }
 
     public async void StartRaycast()

@@ -32,6 +32,8 @@ public class CameraMovement
         _movementTokenSource?.Dispose();
         _eventBus.UnSubscribe<BackpackWasEnabled>(StopMovement);
         _eventBus.UnSubscribe<BackpackWasDisabled>(StartMovement);
+        _input = null;
+        _eventBus = null;
     }
 
     public async void StartMovement()
@@ -44,8 +46,8 @@ public class CameraMovement
 
     public void StopMovement()
     {
-        _movementTokenSource.Cancel();
-        _movementTokenSource.Dispose();
+        _movementTokenSource?.Cancel();
+        _movementTokenSource?.Dispose();
         _movementTokenSource = null;
     }
     

@@ -4,34 +4,36 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Dog),typeof(DogView),typeof(Collider))]
-public class DogHandler : MonoBehaviour, IDisposable
+public class DogHandler : MonoBehaviour, IDisposable, IPauseHandler
 {
     [SerializeField] private DogHandlerSettings _settings;
     private Dog _dog;
     private EventBus _eventBus;
     private CancellationTokenSource _handlerUpdateTokenSource;
     private bool _isFirstAppearing;
-    private bool _isDogActivated;
+    private float _timer;
 
-    public void Initialize(EventBus eventBus)
+    public void Initialize()
     {
-        _eventBus = eventBus;
+        _eventBus = ProjectContext.Instance.EventBus;
         _handlerUpdateTokenSource?.Dispose();
         _handlerUpdateTokenSource = null;
         _isFirstAppearing = true;
-        _isDogActivated = false;
+        _timer = 0f;
 
         _dog = GetComponent<Dog>();
         _dog.Initialize(_eventBus);
 
         _eventBus.Subscribe<DogWasFed>(DeactivateDog);
+        _eventBus.Subscribe<GamePauseEvent>(SetPaused);
     }
     public void Dispose()
     {
+        _eventBus.UnSubscribe<DogWasFed>(DeactivateDog);
+        _eventBus.UnSubscribe<GamePauseEvent>(SetPaused);
         _dog.Dispose();
         StopDogHandlerUpdate();
-
-        _eventBus.UnSubscribe<DogWasFed>(DeactivateDog);
+        _eventBus = null;
     }
 
     public async void StartDogHandlerUpdate()
@@ -50,7 +52,7 @@ public class DogHandler : MonoBehaviour, IDisposable
 
     private async Task HandlerUpdate(CancellationToken token)
     {
-        float timer = 0f;
+        
         int timeToAppearingInSeconds;
         if (_isFirstAppearing) // <-- для первого появления
         {
@@ -64,8 +66,8 @@ public class DogHandler : MonoBehaviour, IDisposable
         
         while (!token.IsCancellationRequested)
         {
-            timer += Time.deltaTime;
-            if (timer >= timeToAppearingInSeconds)
+            _timer += Time.deltaTime;
+            if (_timer >= timeToAppearingInSeconds)
             {
                 ActivateDog();
                 StopDogHandlerUpdate();
@@ -77,12 +79,25 @@ public class DogHandler : MonoBehaviour, IDisposable
     private void ActivateDog()
     {
         _dog.Appear();
-        _isDogActivated = true;
     }
     private void DeactivateDog()
     {
         _dog.Leave();
-        _isDogActivated = false;
         StartDogHandlerUpdate();
+    }
+
+    public void SetPaused(GamePauseEvent gamePause)
+    {
+        if (_dog.IsActivated)
+        {
+            if (gamePause.IsPaused)
+            {
+                StopDogHandlerUpdate();
+            }
+            else
+            {
+                StartDogHandlerUpdate();
+            }
+        }
     }
 }

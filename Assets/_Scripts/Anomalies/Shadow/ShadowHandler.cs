@@ -3,26 +3,33 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 [RequireComponent(typeof(ShadowAnomaly),typeof(ShadowAnomalyView),typeof(Collider))]
-public class ShadowHandler : MonoBehaviour, IDisposable
+public class ShadowHandler : MonoBehaviour, IDisposable, IPauseHandler
 {
     [SerializeField] private ShadowHandlerSettings _settings;
     private ShadowAnomaly _shadow;
     private EventBus _eventBus;
     private CancellationTokenSource _handlerUpdateTokenSource;
+    float _timer;
+    int _timeToAppearingInSeconds;
 
-    public void Initialize(EventBus eventBus)
+    public void Initialize()
     {
-        _eventBus = eventBus;
+        _eventBus = ProjectContext.Instance.EventBus;
         _handlerUpdateTokenSource?.Dispose();
         _handlerUpdateTokenSource = null;
-
+        _timer = 0;
+        _timeToAppearingInSeconds = Random.Range(_settings.MinTimeToAppearingInSeconds, _settings.MaxTimeToAppearingInSeconds);
         _shadow = GetComponent<ShadowAnomaly>();
         _shadow.Initialize(_eventBus);
+
+        _eventBus.Subscribe<GamePauseEvent>(SetPaused);
     }
     public void Dispose()
     {
+        _eventBus.UnSubscribe<GamePauseEvent>(SetPaused);
         _shadow.Dispose();
         StopShadowHandlerUpdate();
+        _eventBus = null;
     }
 
     public async void StartShadowHandlerUpdate()
@@ -41,17 +48,14 @@ public class ShadowHandler : MonoBehaviour, IDisposable
 
     private async Task HandlerUpdate(CancellationToken token)
     {
-        float timer = 0f;
-        int timeToAppearingInSeconds = Random.Range(_settings.MinTimeToAppearingInSeconds, _settings.MaxTimeToAppearingInSeconds);
-        
         while (!token.IsCancellationRequested)
         {
-            timer += Time.deltaTime;
-            if (timer >= timeToAppearingInSeconds)
+            _timer += Time.deltaTime;
+            if (_timer >= _timeToAppearingInSeconds)
             {
                 ActivateShadow();
                 StopShadowHandlerUpdate();
-                timer = 0f;
+                _timer = 0f;
             }
             await Task.Yield();
         }
@@ -60,5 +64,20 @@ public class ShadowHandler : MonoBehaviour, IDisposable
     private void ActivateShadow()
     {
         _shadow.Appear();
+    }
+
+    public void SetPaused(GamePauseEvent gamePause)
+    {
+        if (gamePause.IsPaused)
+        {
+            StopShadowHandlerUpdate();
+            _shadow.StopScreamerTimer();
+            _shadow.StopTimerStopping();
+        }
+        else
+        {
+            StartShadowHandlerUpdate();
+            _shadow.StartScreamerTimer();
+        }
     }
 }

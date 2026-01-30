@@ -2,18 +2,31 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-[RequireComponent(typeof(Animator))]
-public class Smartphone : MonoBehaviour, IDisposable
+[RequireComponent(typeof(SmarthoneView))]
+public class Smartphone : MonoBehaviour, IDisposable, IPauseHandler
 {
-    private PlayerInput _input;
-    private CancellationTokenSource _updateTokenSource;
+    [SerializeField] private SmarthoneSettings _settings;
+    [SerializeField] private GameObject _visualObject;
+    private AudioSource _audioSource;
+    private SmarthoneView _smarthoneView;
     private Animator _animator;
+    private PlayerInput _input;
+    private EventBus _eventBus;
+    private SmartphoneData _data;
+    private CancellationTokenSource _updateTokenSource;
     private bool _smartphoneIsActive;
 
-    public void Initialize(PlayerInput input)
+    public void Initialize()
     {
-        _input = input;
+        _input = ProjectContext.Instance.PlayerInput;
+        _eventBus = ProjectContext.Instance.EventBus;
+        _audioSource = GetComponent<AudioSource>();
+        _smarthoneView = GetComponent<SmarthoneView>();
         _animator = GetComponent<Animator>();
+        _data = new SmartphoneData(_eventBus, _settings, _visualObject, _animator, _audioSource);
+        _smarthoneView.Initialize(_data);
+
+        _eventBus.Subscribe<GamePauseEvent>(SetPaused);
     }
 
     public async void StartSmartphoneUpdate()
@@ -30,16 +43,6 @@ public class Smartphone : MonoBehaviour, IDisposable
         _updateTokenSource = null;
     }
 
-    private async void TurnOn()
-    {
-        _animator.SetBool("IsTurnedOn", true);
-    }
-
-    private void TurnOff()
-    {
-        _animator.SetBool("IsTurnedOn", false);
-    }
-
     private async Task SmartphoneUpdate(CancellationToken token)
     {
         while (!token.IsCancellationRequested)
@@ -48,12 +51,12 @@ public class Smartphone : MonoBehaviour, IDisposable
             {
                 if (_smartphoneIsActive == false) // Если телефон ещё НЕ включен
                 {
-                    TurnOn();
+                    _smarthoneView.PlayTurnOnAnimation();
                     _smartphoneIsActive = true;
                 }
                 else
                 {
-                    TurnOff();
+                    _smarthoneView.PlayTurnOffAnimation();
                     _smartphoneIsActive = false;
                 }
             }
@@ -63,8 +66,22 @@ public class Smartphone : MonoBehaviour, IDisposable
 
     public void Dispose()
     {
-        _input.Dispose();
+        _eventBus.UnSubscribe<GamePauseEvent>(SetPaused);
+        _input = null;
+        _eventBus = null;
+        _smarthoneView.Dispose();
         StopSmartphoneUpdate();
-        _animator = null;
+    }
+
+    public void SetPaused(GamePauseEvent gamePause)
+    {
+        if (gamePause.IsPaused)
+        {
+            StopSmartphoneUpdate();
+        }
+        else
+        {
+            StartSmartphoneUpdate();
+        }
     }
 }
