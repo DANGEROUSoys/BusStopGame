@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 namespace BoneMiniGame
@@ -39,6 +39,7 @@ namespace BoneMiniGame
         {
             if (_handlerUpdate != null)
                 StopCoroutine(_handlerUpdate);
+            _currentProgress = 0;
             _handlerUpdate = null;
         }
         private bool IsInside(Collider2D outer, Collider2D inner)
@@ -53,17 +54,20 @@ namespace BoneMiniGame
         {
             while (true)
             {
-                if (IsInside(_frameCollider, _boneCollider))
-                {
-                    _currentProgress += Time.deltaTime * _progressPerFrame;
-                    _progressBar.SetProgress(_currentProgress);
-                }
-                if (_currentProgress >= 1)
-                {
-                    StopUpdate();
-                    _eventBus.Invoke(new BoneMiniGameWasComplited());
-                    
-                    Debug.Log("Мини-игра с косточкой выполнена! Нужно послать эвент об этом.");
+                if (NightData.Instance.MenuIsActive == false)
+                {  // Игра НЕ на паузе
+                    if (IsInside(_frameCollider, _boneCollider))
+                    {
+                        _currentProgress += Time.deltaTime * _progressPerFrame;
+                        _progressBar.SetProgress(_currentProgress);
+                    }
+                    if (_currentProgress >= 1)
+                    {
+                        StopUpdate();
+                        _eventBus.Invoke(new BoneMiniGameWasComplited());
+
+                        Debug.Log("Мини-игра с косточкой выполнена! Нужно послать эвент об этом.");
+                    }
                 }
                 yield return null;
             }

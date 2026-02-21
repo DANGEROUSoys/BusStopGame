@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -50,22 +50,33 @@ public class PlayerRaycast : IDisposable
     {
         while (!token.IsCancellationRequested)
         {
-            Vector2 mousePosition = _input.Game.MousePosition.ReadValue<Vector2>();
-            Ray ray = _camera.ScreenPointToRay(mousePosition);
+            if (NightData.Instance.MenuIsActive == false)
+            {  // Игра НЕ на паузе
+                Vector2 mousePosition = _input.Game.MousePosition.ReadValue<Vector2>();
+                Ray ray = _camera.ScreenPointToRay(mousePosition);
 
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
-            {
-                if (hit.collider.TryGetComponent<IInteractive>(out IInteractive interactiveObject))
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit))
                 {
-                    if (_currentInteractiveObject != null)
-                        _currentInteractiveObject.StopHitInteraction();
-                    _currentInteractiveObject = interactiveObject;
-                    _currentInteractiveObject.StartHitInteraction();
-
-                    if (_input.Game.LeftClick.WasPressedThisFrame())
+                    if (hit.collider.TryGetComponent<IInteractive>(out IInteractive interactiveObject))
                     {
-                        _currentInteractiveObject.Interact();
+                        if (_currentInteractiveObject != null)
+                            _currentInteractiveObject.StopHitInteraction();
+                        _currentInteractiveObject = interactiveObject;
+                        _currentInteractiveObject.StartHitInteraction();
+
+                        if (_input.Game.LeftClick.WasPressedThisFrame())
+                        {
+                            _currentInteractiveObject.Interact();
+                        }
+                    }
+                    else
+                    {
+                        if (_currentInteractiveObject != null)
+                        {
+                            _currentInteractiveObject.StopHitInteraction();
+                            _currentInteractiveObject = null;
+                        }
                     }
                 }
                 else
@@ -75,14 +86,6 @@ public class PlayerRaycast : IDisposable
                         _currentInteractiveObject.StopHitInteraction();
                         _currentInteractiveObject = null;
                     }
-                }
-            }
-            else
-            {
-                if (_currentInteractiveObject != null)
-                {
-                    _currentInteractiveObject.StopHitInteraction();
-                    _currentInteractiveObject = null;
                 }
             }
             await Task.Yield();

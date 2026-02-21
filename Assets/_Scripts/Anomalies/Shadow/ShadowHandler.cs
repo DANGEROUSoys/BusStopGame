@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -50,12 +50,15 @@ public class ShadowHandler : MonoBehaviour, IDisposable, IPauseHandler
     {
         while (!token.IsCancellationRequested)
         {
-            _timer += Time.deltaTime;
-            if (_timer >= _timeToAppearingInSeconds)
-            {
-                ActivateShadow();
-                StopShadowHandlerUpdate();
-                _timer = 0f;
+            if (NightData.Instance.MenuIsActive == false)
+            {  // Игра НЕ на паузе
+                _timer += Time.deltaTime;
+                if (_timer >= _timeToAppearingInSeconds)
+                {
+                    ActivateShadow();
+                    StopShadowHandlerUpdate();
+                    _timer = 0f;
+                }
             }
             await Task.Yield();
         }

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -34,12 +34,14 @@ namespace BoneMiniGame
         {
             while (true)
             {
-                Vector2 mouseDelta = _input.Game.MouseMovement.ReadValue<Vector2>();
+                if (NightData.Instance.MenuIsActive == false)
+                {  // Игра НЕ на паузе
+                    Vector2 mouseDelta = _input.Game.MouseMovement.ReadValue<Vector2>();
 
-                Vector2 newPosition = _boneTransform.anchoredPosition + mouseDelta * _mouseSensitivity;
+                    Vector2 newPosition = _boneTransform.anchoredPosition + mouseDelta * _mouseSensitivity;
 
-                _boneTransform.anchoredPosition = ClampPosition(newPosition, _gamePlaneTransform);
-
+                    _boneTransform.anchoredPosition = ClampPosition(newPosition, _gamePlaneTransform);
+                }
                 yield return null;
             }
         }

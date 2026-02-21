@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 namespace BoneMiniGame 
@@ -57,9 +57,12 @@ namespace BoneMiniGame
         {
             while (true)
             {
-                if (_input.Game.Quit.WasPressedThisFrame() || _input.Game.RightClick.WasPressedThisFrame())
-                {
-                    StopGame();
+                if (NightData.Instance.MenuIsActive == false)
+                {  // Игра НЕ на паузе
+                    if (_input.Game.RightClick.WasPressedThisFrame())
+                    {
+                        StopGame();
+                    }
                 }
                 yield return null;
             }

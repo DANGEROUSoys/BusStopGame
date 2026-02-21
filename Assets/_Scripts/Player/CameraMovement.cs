@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -55,20 +55,23 @@ public class CameraMovement
     {
         while (!token.IsCancellationRequested)
         {
-            float xInput = _input.Game.XInput.ReadValue<float>();
-            float xPosition = _input.Game.MousePosition.ReadValue<Vector2>().x;
-            float screenWidth = Screen.width;
-
-            if(xPosition <= _settings.EdgeThreshold)
+            if (NightData.Instance.MenuIsActive == false) // Игра НЕ на паузе
             {
-                xInput = -1;
-            }
-            else if(xPosition >= screenWidth - _settings.EdgeThreshold)
-            {
-                xInput = 1;
-            }
+                float xInput = _input.Game.XInput.ReadValue<float>();
+                float xPosition = _input.Game.MousePosition.ReadValue<Vector2>().x;
+                float screenWidth = Screen.width;
 
-            RotateCamera(xInput);
+                if (xPosition <= _settings.EdgeThreshold)
+                {
+                    xInput = -1;
+                }
+                else if (xPosition >= screenWidth - _settings.EdgeThreshold)
+                {
+                    xInput = 1;
+                }
+
+                RotateCamera(xInput);
+            }
             await Task.Yield();
         }
     }

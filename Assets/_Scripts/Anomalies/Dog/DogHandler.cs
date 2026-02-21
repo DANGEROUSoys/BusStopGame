@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -12,6 +12,7 @@ public class DogHandler : MonoBehaviour, IDisposable, IPauseHandler
     private CancellationTokenSource _handlerUpdateTokenSource;
     private bool _isFirstAppearing;
     private float _timer;
+    private bool _gameOnPause;
 
     public void Initialize()
     {
@@ -20,6 +21,7 @@ public class DogHandler : MonoBehaviour, IDisposable, IPauseHandler
         _handlerUpdateTokenSource = null;
         _isFirstAppearing = true;
         _timer = 0f;
+        _gameOnPause = false;
 
         _dog = GetComponent<Dog>();
         _dog.Initialize(_eventBus);
@@ -63,14 +65,19 @@ public class DogHandler : MonoBehaviour, IDisposable, IPauseHandler
         {
             timeToAppearingInSeconds = Random.Range(_settings.MinTimeToAppearingInSeconds, _settings.MaxTimeToAppearingInSeconds);
         }
+
+        _timer = 0;
         
         while (!token.IsCancellationRequested)
         {
-            _timer += Time.deltaTime;
-            if (_timer >= timeToAppearingInSeconds)
-            {
-                ActivateDog();
-                StopDogHandlerUpdate();
+            if (NightData.Instance.MenuIsActive == false)
+            { // Игра НЕ на паузе
+                _timer += Time.deltaTime;
+                if (_timer >= timeToAppearingInSeconds)
+                {
+                    ActivateDog();
+                    StopDogHandlerUpdate();
+                }
             }
             await Task.Yield();
         }
@@ -88,16 +95,6 @@ public class DogHandler : MonoBehaviour, IDisposable, IPauseHandler
 
     public void SetPaused(GamePauseEvent gamePause)
     {
-        if (_dog.IsActivated)
-        {
-            if (gamePause.IsPaused)
-            {
-                StopDogHandlerUpdate();
-            }
-            else
-            {
-                StartDogHandlerUpdate();
-            }
-        }
+        _gameOnPause = gamePause.IsPaused;
     }
 }

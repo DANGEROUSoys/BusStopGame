@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -67,9 +67,12 @@ public class MiniGameSelectionMenu : MonoBehaviour, IDisposable, IPauseHandler
     {
         while (!token.IsCancellationRequested)
         {
-            if (_input.Game.Quit.WasPressedThisFrame())
-            {
-                StopSelectionMenu();
+            if (NightData.Instance.MenuIsActive == false)
+            {  // Игра НЕ на паузе
+                if (_input.Game.Quit.WasPressedThisFrame())
+                {
+                    StopSelectionMenu();
+                }
             }
             await Task.Yield();
         }
@@ -109,11 +112,7 @@ public class MiniGameSelectionMenu : MonoBehaviour, IDisposable, IPauseHandler
     {
         if (gamePause.IsPaused)
         {
-            StopSelectionMenu();
-        }
-        else
-        {
-            StartSelectionMenu();
+            //StopSelectionMenu();
         }
     }
 }

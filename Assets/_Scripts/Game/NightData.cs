@@ -1,7 +1,12 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class NightData
 {
     public bool MenuIsActive;
-    public bool MiniGameMenuIsActive;
+    public static NightData Instance;
+
+    public NightData()
+    {
+        Instance = this;
+    }
 }

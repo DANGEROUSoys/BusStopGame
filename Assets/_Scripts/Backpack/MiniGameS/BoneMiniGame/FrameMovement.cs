@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -49,24 +49,30 @@ namespace BoneMiniGame
         {
             while (true)
             {
-                _isMoving = true;
-                Vector2 startPos = _frameTransform.anchoredPosition;
-                float distance = Vector2.Distance(startPos, _targetPosition);
-                float timeTaken = distance / _speed;
-                float elapsedTime = 0f;
+                if (NightData.Instance.MenuIsActive == false)
+                {  // Игра НЕ на паузе
+                    _isMoving = true;
+                    Vector2 startPos = _frameTransform.anchoredPosition;
+                    float distance = Vector2.Distance(startPos, _targetPosition);
+                    float timeTaken = distance / _speed;
+                    float elapsedTime = 0f;
 
-                while (elapsedTime <= timeTaken)
-                {
-                    _frameTransform.anchoredPosition = Vector2.Lerp(startPos, _targetPosition, elapsedTime / timeTaken);
-                    elapsedTime += Time.deltaTime;
-                    yield return null;
+                    while (elapsedTime <= timeTaken)
+                    {
+                        if (NightData.Instance.MenuIsActive == false)
+                        {  // Игра НЕ на паузе
+                            _frameTransform.anchoredPosition = Vector2.Lerp(startPos, _targetPosition, elapsedTime / timeTaken);
+                            elapsedTime += Time.deltaTime;
+                        }
+                        yield return null;
+                    }
+
+                    _frameTransform.anchoredPosition = _targetPosition;
+                    _isMoving = false;
+
+                    SetNewTarget();
                 }
-
-                _frameTransform.anchoredPosition = _targetPosition;
-                _isMoving = false;
-
-                yield return new WaitForSeconds(Random.Range(_minDelay, _maxDelay));
-                SetNewTarget();
+                    yield return new WaitForSeconds(Random.Range(_minDelay, _maxDelay));
             }
         }
     }

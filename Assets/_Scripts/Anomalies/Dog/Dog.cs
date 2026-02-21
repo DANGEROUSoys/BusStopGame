@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -96,7 +96,10 @@ public class Dog : MonoBehaviour, IStateSwitcher, IInteractive, IDisposable,IPau
     {
         while (!token.IsCancellationRequested)
         {
-            _currentState.Update();
+            if (NightData.Instance.MenuIsActive == false)
+            {  // Игра НЕ на паузе
+                _currentState.Update();
+            }
             await Task.Yield();
         }
     }

@@ -1,4 +1,4 @@
-using System.Threading;
+Ôªøusing System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -47,17 +47,20 @@ public class Smartphone : MonoBehaviour, IDisposable, IPauseHandler
     {
         while (!token.IsCancellationRequested)
         {
-            if (_input.Game.AlterInteract.WasPressedThisFrame())
-            {
-                if (_smartphoneIsActive == false) // ≈ÒÎË ÚÂÎÂÙÓÌ Â˘∏ Õ≈ ‚ÍÎ˛˜ÂÌ
+            if (NightData.Instance.MenuIsActive == false)
+            {  // –ò–≥—Ä–∞ –ù–ï –Ω–∞ –ø–∞—É–∑–µ
+                if (_input.Game.AlterInteract.WasPressedThisFrame())
                 {
-                    _smarthoneView.PlayTurnOnAnimation();
-                    _smartphoneIsActive = true;
-                }
-                else
-                {
-                    _smarthoneView.PlayTurnOffAnimation();
-                    _smartphoneIsActive = false;
+                    if (_smartphoneIsActive == false) // –ï—Å–ª–∏ —Ç–µ–ª–µ—Ñ–æ–Ω –µ—â—ë –ù–ï –≤–∫–ª—é—á–µ–Ω
+                    {
+                        _smarthoneView.PlayTurnOnAnimation();
+                        _smartphoneIsActive = true;
+                    }
+                    else
+                    {
+                        _smarthoneView.PlayTurnOffAnimation();
+                        _smartphoneIsActive = false;
+                    }
                 }
             }
             await Task.Yield();

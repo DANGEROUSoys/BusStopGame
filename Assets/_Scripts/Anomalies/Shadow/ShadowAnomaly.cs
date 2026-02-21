@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -74,16 +74,19 @@ public class ShadowAnomaly : MonoBehaviour, IInteractive, IDisposable
     {
         while (!token.IsCancellationRequested)
         {
-            _currentTime += Time.deltaTime;
+            if (NightData.Instance.MenuIsActive == false)
+            {  // Игра НЕ на паузе
+                _currentTime += Time.deltaTime;
 
-            if (_currentTime > _shadowSettings.TimeBeforeScreamer)
-            {
-                Debug.Log("Игрок проиграл от: ТЕНИ.");
-                _eventBus.Invoke(new ShadowScreamerEvent());
-                StopScreamerTimer();
+                if (_currentTime > _shadowSettings.TimeBeforeScreamer)
+                {
+                    Debug.Log("Игрок проиграл от: ТЕНИ.");
+                    _eventBus.Invoke(new ShadowScreamerEvent());
+                    StopScreamerTimer();
+                }
+
+                _shadowAnomalyView.ChangeShadowScale(_currentTime);
             }
-            
-            _shadowAnomalyView.ChangeShadowScale(_currentTime);
             await Task.Yield();
         }
     }
